@@ -34,8 +34,8 @@ def extract_audio_from_video(input_vid_path:str,
 
 def main():
     input_vid_file = "E:/downloads/conference_video.mp4"
-    output_wav_file  = "E:/downloads/meeting_16k_mono.wav"
-    extract_audio_from_video(input_vid_file, output_wav_file)
+    output_audio_file  = "E:/downloads/meeting_16k_mono.wav"
+    extract_audio_from_video(input_vid_file, output_audio_file)
     print(" Saved. ")
 
 if __name__ == "__main__":
