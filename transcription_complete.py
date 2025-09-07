@@ -68,12 +68,14 @@ def fast_heuristic_diarization(audio_file, min_silence_len=500, silence_thresh=-
     """
     sound = AudioSegment.from_file(audio_file, format="wav")
 
+    print("---loaded audio---")
     # Split on silence
     chunks = silence.split_on_silence(
         sound,
         min_silence_len=min_silence_len,
         silence_thresh=silence_thresh
     )
+    print("---Split into chunks---")
 
     diarized_segments = []
     speaker_toggle = 0  # alternate speakers
@@ -89,7 +91,7 @@ def fast_heuristic_diarization(audio_file, min_silence_len=500, silence_thresh=-
         })
         current_time += duration_sec
         speaker_toggle = 1 - speaker_toggle  # alternate speakers
-    
+    print("---Diarized the audio---")
     return diarized_segments
 
 def combine_transcript_with_diarization(whisper_segments,diar_segments):
@@ -111,10 +113,11 @@ def combine_transcript_with_diarization(whisper_segments,diar_segments):
             "end": seg_end,
             "text": seg_text
         })
+    print("---Combined audio with diarization---")
     return merged
 
-def main():
-    input_audio_file  = "E:/downloads/meeting_preprocessed.wav"
+def transcribe_audio(input_audio_file):
+    # input_audio_file  = "E:/downloads/meeting_preprocessed.wav"
     transcript = transcribe_with_openai(input_audio_file)
     print(" Transcription : ", transcript.text)
 
@@ -125,6 +128,12 @@ def main():
     final_transcript = combine_transcript_with_diarization(
                                     transcript.segments,
                                     diarized_segments )
+    return final_transcript
+
+def main():
+    input_audio_file  = "E:/downloads/meeting_preprocessed.wav"
+    final_transcript = transcribe_audio(input_audio_file)
     print("Final ",final_transcript)
+
 if __name__ == "__main__":
     main()
