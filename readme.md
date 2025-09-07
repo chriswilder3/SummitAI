@@ -71,8 +71,8 @@ Users upload a video file, and SummitAI automatically extracts the audio, transc
 
 ## 📌 Project Status
 - **Phase 1 (Done)**: Video loading, audio extraction, test clip generation.  
-- **Phase 2 (In Progress)**: Whisper transcription + cleaning pipeline.  
-- **Phase 3 (Planned)**: Summarization + RAG-based QA.  
+- **Phase 2 (Done)**: Whisper transcription + cleaning pipeline.  
+- **Phase 3 (In Progress)**: Summarization + RAG-based QA.  
 - **Phase 4 (Planned)**: UI dashboard + integrations.  
 
 ---

@@ -1,4 +1,7 @@
-from transcription_complete import transcribe_audio
+from audio_extract import extract_audio_from_video
+from audio_preprocess import preprocess_audio
+from transcription import transcribe_audio
+
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -14,7 +17,11 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain.chains.summarize import load_summarize_chain
 
-def summarize(llm, transcript):
+def stuffed_summarize(llm, transcript_segments):
+    
+    # Convert JSON transcript into plain text for summarization
+    transcript_text = " ".join([seg["text"] for seg in transcript_segments])
+    
     print("---Summerizing---")
     summary_prompt = PromptTemplate.from_template(
         template="""
@@ -28,9 +35,8 @@ def summarize(llm, transcript):
             """
     )
     chain = summary_prompt | llm
-    response = chain.invoke({"transcript":transcript})
+    response = chain.invoke({"transcript":transcript_text})
     return response.content
-
 
 def map_reduce_summarize(llm, transcript_segments):
 
@@ -88,16 +94,24 @@ def map_reduce_summarize(llm, transcript_segments):
     return response
 
 def main():
-    input_audio_file = "E:/downloads/meeting_preprocessed.wav"
+    raw_video_file = "E:/downloads/conference_video.mp4"
+    extracted_audio_file = "E:/downloads/meeting_16k_mono.wav"
+    preprocessed_audio_file = "E:/downloads/meeting_preprocessed.wav"
     
-    # Step 1: Transcribe audio
-    transcript_segments = transcribe_audio(input_audio_file)
-    
-    # Convert JSON transcript into plain text for summarization
-    transcript_text = " ".join([seg["text"] for seg in transcript_segments])
-    
-    # Step 2: Summarize
-    # summary = summarize(llm, transcript_text)
+    # Step 1 : extract audio
+    extract_audio_from_video(raw_video_file,extracted_audio_file )
+    print("---Audio extracted---")
+
+    # Step 2 : preprocess audio
+    preprocess_audio(extracted_audio_file, preprocessed_audio_file)
+    print("---Audio preprocessed---")
+
+    # Step 3: Transcribe audio
+    transcript_segments = transcribe_audio(preprocessed_audio_file)
+    print("---Audio preprocessed---")
+
+    # Step 4: Summarize
+    # summary = stuffed_summarize(llm, transcript_segments)
     summary = map_reduce_summarize(llm, transcript_segments)
 
     print("📌 Meeting Summary:\n")
