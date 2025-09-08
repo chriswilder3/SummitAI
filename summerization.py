@@ -42,7 +42,7 @@ def map_reduce_summarize(llm, transcript_segments):
 
     
     # Step 1: Flatten transcript into grouped chunks
-    transcript_text = " ".join([f"{seg['speaker']}: {seg['text']}"
+    transcript_text = " ".join([seg['text']
                                  for seg in transcript_segments])
     
     # Step 2: Split into Documents (chunks of ~2000 chars)
@@ -63,7 +63,7 @@ def map_reduce_summarize(llm, transcript_segments):
 
         Your summary should include:
         - Main discussion points
-        - Speaker perspectives
+        - Perspectives expressed (speakers/parties supporting those views if available)
         - Any implied disagreements or concerns
 
         Write at least 3 bullet points.
@@ -78,7 +78,7 @@ def map_reduce_summarize(llm, transcript_segments):
         Write:
         1. A detailed summary.
         2. Key decisions made.
-        3. Action items (with responsible person if available).
+        3. Action items (with responsible person/party if available).
     """
     # Step 3: Load map-reduce summarization chain
     chain = load_summarize_chain(

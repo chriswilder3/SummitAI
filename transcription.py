@@ -4,8 +4,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from pyannote.audio import Pipeline
-hf_token = os.getenv('YOUR_HF_TOKEN')
+
+# hf_token = os.getenv('YOUR_HF_TOKEN')
 
 from pydub import AudioSegment, silence
 
@@ -34,6 +34,7 @@ def transcribe_with_openai(audio_file: str,
 
 def diarize_and_merge(audio_file, hf_token, transcript):
     
+    # from pyannote.audio import Pipeline
     # --- Step 1: Run diarization ---
     pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization",
                                         use_auth_token=hf_token)
@@ -261,16 +262,16 @@ def transcribe_audio(input_audio_file):
     # final_transcript = diarize_and_merge(input_audio_file,
     #                                hf_token, transcript)
     
-    diarized_segments = fast_heuristic_diarization(input_audio_file)
-    final_transcript = combine_transcript_with_diarization_2(
-                                    transcript,
-                                    diarized_segments )
-    return final_transcript
+    # diarized_segments = fast_heuristic_diarization(input_audio_file)
+    # final_transcript = combine_transcript_with_diarization_2(
+    #                                transcript,
+    #                                 diarized_segments )
+    return transcript
 
 def main():
     input_audio_file  = "E:/downloads/meeting_preprocessed.wav"
     final_transcript = transcribe_audio(input_audio_file)
-    print("Final ",final_transcript)
+    # print("Final ",final_transcript)
 
 if __name__ == "__main__":
     main()
