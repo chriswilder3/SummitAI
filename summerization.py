@@ -38,8 +38,12 @@ def stuffed_summarize(llm, transcript_segments):
     response = chain.invoke({"transcript":transcript_text})
     return response.content
 
-def map_reduce_summarize(llm, transcript_segments):
+def map_reduce_summarize( transcript_segments):
 
+    llm = ChatOpenAI(
+        model = "gpt-4.1-mini",
+        api_key= os.getenv('OPENAI_API_KEY')
+    )
     
     # Step 1: Flatten transcript into grouped chunks
     transcript_text = " ".join([seg['text']
@@ -64,7 +68,7 @@ def map_reduce_summarize(llm, transcript_segments):
         Your summary should include:
         - Main discussion points
         - Perspectives expressed (speakers/parties supporting those views if available)
-        - Any implied disagreements or concerns
+        - Any implied disagreements or concerns ( if available)
 
         Write at least 3 bullet points.
     """
@@ -78,7 +82,7 @@ def map_reduce_summarize(llm, transcript_segments):
         Write:
         1. A detailed summary.
         2. Key decisions made.
-        3. Action items (with responsible person/party if available).
+        3. Action items if available (with responsible person/party if available).
     """
     # Step 3: Load map-reduce summarization chain
     chain = load_summarize_chain(
@@ -93,8 +97,8 @@ def map_reduce_summarize(llm, transcript_segments):
     response = chain.invoke(docs)
     return response
 
-def main():
-    raw_video_file = "E:/downloads/conference_video.mp4"
+def summerize(raw_video_file):
+    # raw_video_file = "E:/downloads/corporate_meeting.mp4"
     extracted_audio_file = "E:/downloads/meeting_16k_mono.wav"
     preprocessed_audio_file = "E:/downloads/meeting_preprocessed.wav"
     
@@ -112,10 +116,15 @@ def main():
 
     # Step 4: Summarize
     # summary = stuffed_summarize(llm, transcript_segments)
-    summary = map_reduce_summarize(llm, transcript_segments)
+    summary = map_reduce_summarize( transcript_segments)
 
     print("📌 Meeting Summary:\n")
     print(summary['output_text'])
+
+def main():
+    raw_video_file = "E:/downloads/corporate_meeting.mp4"
+    
+    summerize(raw_video_file)
 
 if __name__ == "__main__":
     main()
