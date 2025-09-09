@@ -45,4 +45,26 @@ if uploaded_file is not None:
         st.subheader("📝 Transcript")
 
         transcript_text = "\n".join([seg["text"] for seg in transcript_segments])
+        
+        # Initialize st message session to store user and ai chats
+        if "messages"  not in st.session_state:
+            st.session_state.messages = []
+
+        for message in st.session_state.messages:
+            # with st.chat_message("Chat with SummitAI"):
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        user_input = st.chat_input("Ask question about meeting : ")
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+            st.session_state.messages.append({"role":"user",
+                                              "content":user_input})
+        
+        response = f"Echo : {user_input}"
+        with st.chat_message("assistant"):
+            st.markdown(response)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+
         st.text_area("Full Transcript", transcript_text, height=300)
