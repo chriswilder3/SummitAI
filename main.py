@@ -3,6 +3,7 @@ from summerization import map_reduce_summarize
 from transcription import transcribe_audio
 from audio_extract import extract_audio_from_video
 from audio_preprocess import preprocess_audio
+from rag import create_rag
 import os
 
 st.title("🎥 SummitAI: Your AI Meeting & Conference Companion")
@@ -46,6 +47,8 @@ if uploaded_file is not None:
 
         transcript_text = "\n".join([seg["text"] for seg in transcript_segments])
         
+        rag = create_rag(transcript_text)
+
         # Initialize st message session to store user and ai chats
         if "messages"  not in st.session_state:
             st.session_state.messages = []
