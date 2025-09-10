@@ -3,43 +3,52 @@
 > **From Meetings to Meaning — AI that Transcribes, Summarizes, and Surfaces Insights.**
 
 SummitAI is an **AI-powered meeting companion** that transforms raw meeting recordings into **structured knowledge**.  
-Users upload a video file, and SummitAI automatically extracts the audio, transcribes speech using Whisper, and applies LLM-powered pipelines for **summarization, question answering, and retrieval-augmented insights**.  
+Users upload a video file, and SummitAI automatically extracts the audio, transcribes speech using Whisper, and applies LLM-powered pipelines for **summarization, question answering, and retrieval-augmented Q&A chat**.  
 
 ---
 
-## ✨ Features (Current & Planned)
+## ✨ Features
 
-### ✅ Implemented so far
-- **Video → Audio Extraction**  
-  - Load `.mp4` (or other formats) using `moviepy`.  
-  - Extract audio track, resampled to **16kHz mono WAV** (Whisper-ready).  
-  - Dev-friendly shortcut: generate short test clips (e.g., 1 min from 2:00–3:00).  
+### 1. Video & Audio Processing
+  - Uploads **MP4 video** via Streamlit frontend.
+  - Load Video Segments using `moviepy`.  
+  - Extracts audio (`ffmpeg`).  
+  - Preprocesses audio (mono, **16kHz mono WAV**)     (Whisper-ready)  
+  - Supports chunked transcription to avoid long input issues.   
 
-- **Clean Dev Workflow**  
-  - Test with smaller video chunks before scaling to full-length meetings.  
-  - Support for both `moviepy` (Python-based) and `ffmpeg` (fast CLI).  
+### 2. Transcription
+  - **Speech-to-Text**  
+    - Uses **OpenAI Whisper API** for accurate transcripts.
+    - Returns structured transcript with:  
+      ```json
+      { "start": float, "end": float, "text": str }    
+  - **Text Cleaning & Structuring**  
+    - Removing filler words.  
 
----
+### 3. Meeting Summarization
+- Implemented **Map-Reduce Summarizations**
+  - map_prompt: chunk-wise summaries (main points + perspectives).
+  - reduce_prompt: combines into *Decisions*, *Action Items*, *Open Questions*.
+  - Output is concise, structured, and useful for meeting follow-ups.
 
-### 🛠️ Work in Progress
-- **Speech-to-Text**  
-  - Whisper integration for accurate transcripts.  
-  - Preprocessing (volume normalization, silence trimming).  
-  - Speaker diarization (separating who said what).  
+### 4. RAG-based QA 
+  - Chunk transcripts into vector DB. For developement, stored in InMemoryVectorStore.
+  - Embedding function is based on openAI's text-embedding-3-large.
+  - Question answering flow:
+    - Retrieve relevant transcript chunks.
+    - Pass context + question into LLM (via rlm/rag-prompt)  - - - Return grounded answers.  
+  - Natural language queries like: *“What was discussed about budget in the meeting?”*
+  - Only summary, transcript, and graph are stored in session (not raw video/audio).  
 
-- **Text Cleaning & Structuring**  
-  - Removing filler words.  
-  - JSON transcript structure with timestamps + speakers.  
-
----
-
-### 🔮 Next Steps (Planned)
-- **Meeting Summaries**  
-  - Concise summaries grouped into *Decisions*, *Action Items*, *Open Questions*.  
-
-- **RAG-based QA**  
-  - Chunk transcripts into vector DB.  
-  - Natural language queries like: *“What was discussed about budget last week?”*  
+### 4. RAG-based QA
+  - Upload & Process video (single click).
+  - Sidebar: Meeting Summary.
+  - Transcript Viewer: hidden under expander to avoid clutter.
+  - Chatbot Interface: 
+    - Persistent chat history via st. session_state.messages.
+    - User can ask natural questions about the meeting.
+    - Powered by RAG backend.
+  - Only summary, transcript, and graph are stored in session (not raw video/audio).
 
 - **Multi-Meeting Knowledge Base**  
   - Search across multiple past meetings.  
@@ -53,36 +62,34 @@ Users upload a video file, and SummitAI automatically extracts the audio, transc
 ---
 
 ## ⚙️ Tech Stack
-- **Video/Audio Handling**: `moviepy`, `ffmpeg`, `pydub`  
+- **Video/Audio Handling**: `moviepy`, `pydub`  
 - **Speech-to-Text**: [OpenAI Whisper](https://github.com/openai/whisper)  
 - **LLM Framework**: [LangChain](https://www.langchain.com/)  
-- **Vector Store**: FAISS / Pinecone / Weaviate  
-- **Backend**: FastAPI  
-- **Frontend**: Streamlit (dev) → Next.js (production)  
-
----
-
-## 🚧 Development Notes
-- For testing, we currently reduce input video to **1-minute clips** (e.g., 2:00–3:00 mark) to speed up iteration.  
-- Full-meeting support will be added once the transcription pipeline is stable.  
-- Keeping preprocessing modular so Whisper + RAG can be swapped or upgraded later.  
+- **Vector Store**: InMemoryVectorStore (easily changeable to Chroma)  
+- **Embeddings**: OpenAI text-embedding-3-large
+- **Summarization**: LangChain Map-Reduce
+- **Frontend**: Streamlit (dev) 
 
 ---
 
 ## 📌 Project Status
 - **Phase 1 (Done)**: Video loading, audio extraction, test clip generation.  
 - **Phase 2 (Done)**: Whisper transcription + cleaning pipeline.  
-- **Phase 3 (In Progress)**: Summarization + RAG-based QA.  
-- **Phase 4 (Planned)**: UI dashboard + integrations.  
+- **Phase 3 (Done)**: Summarization + RAG-based QA.  
+- **Phase 4 (Done)**: UI dashboard + integrations.  
 
 ---
 
 ## 📖 Example Use Case
-- Upload a 1-hour Zoom/Meet recording.  
+- Upload a 30 min Zoom/Meet recording.  
 - SummitAI extracts and transcribes speech.  
 - Get a structured meeting summary with **key decisions and action items**.  
 - Ask questions like:  
-  > *"What did Alice say about the Q4 budget?"*  
+  > *"What did was discussed about the Q4 budget?"*  
   > *"List all action items assigned to Bob."*  
 
 ---
+
+## Special Notes 
+- If you want to change the clip length considered for the
+  SummitAI, change the **clip_length** variable to desired time(in seconds) in **extract_audio_from_video** function of **audio_extract.py**

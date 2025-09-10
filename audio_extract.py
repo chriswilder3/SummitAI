@@ -19,10 +19,11 @@ def extract_audio_from_video(input_vid_path:str,
         raise FileNotFoundError(f"Video not found: {input_vid_path}")
     
     # Load the Video file clip and check for audio
+    clip_length = 180
 
     clip = VideoFileClip(input_vid_path)
-    if clip.duration >= 500:
-        clip = clip.subclipped(1, 500)
+    if clip.duration >= clip_length:
+        clip = clip.subclipped(1, clip_length)
 
     # clip = VideoFileClip(input_vid_path)
     if clip.audio is None:
